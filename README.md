@@ -1,2 +1,1 @@
-# ACES
- Deterministic Frameworks for Algorithmic Calculus Problem Generation: Exploiting Symbolic Computation, Equality Saturation, and Differential Algebra
+Dw about it for now :)
