@@ -2,7 +2,6 @@ module Visualization
 
 using ..Ingestion
 using Latexify
-using SymbolicIntegration
 using Symbolics
 
 export generate_proof, forward_verify
@@ -14,6 +13,7 @@ Uses SymbolicIntegration.jl (RUBI) to solve the integration and generate
 a step-by-step mathematical proof confirming the deterministic generation.
 """
 function forward_verify(expr)
+    @eval using SymbolicIntegration
     @variables x
     # Forward pass using RUBI rules
     result = integrate(expr, x)

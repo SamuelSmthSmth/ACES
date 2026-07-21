@@ -1,7 +1,5 @@
 module ACES
 
-__precompile__(false)
-
 using Symbolics
 using SymbolicUtils
 using JSON

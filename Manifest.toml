@@ -72,7 +72,7 @@ weakdeps = ["SparseArrays", "StaticArrays"]
     AdaptStaticArraysExt = "StaticArrays"
 
 [[deps.AlgorithmicCalculus]]
-deps = ["AbstractTrees", "JET", "JSON", "Latexify", "MutableArithmetics", "PyCall", "StaticArrays", "SymPy", "SymbolicIntegration", "SymbolicNumericIntegration", "SymbolicUtils", "Symbolics", "TermInterface"]
+deps = ["AbstractTrees", "JET", "JSON", "Latexify", "MutableArithmetics", "PackageCompiler", "PyCall", "StaticArrays", "SymPy", "SymbolicIntegration", "SymbolicNumericIntegration", "SymbolicUtils", "Symbolics", "TermInterface"]
 path = "."
 uuid = "38dd47f7-2e6d-4b35-862e-7a96ae49c3d6"
 version = "0.1.0"
