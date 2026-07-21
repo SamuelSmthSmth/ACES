@@ -15,8 +15,8 @@ a step-by-step mathematical proof confirming the deterministic generation.
 function forward_verify(expr)
     @eval using SymbolicIntegration
     @variables x
-    # Forward pass using RUBI rules
-    result = integrate(expr, x)
+    # Forward pass using RUBI rules, via invokelatest to avoid world-age and namespace issues
+    result = Base.invokelatest(SymbolicIntegration.integrate, expr, x)
     return result
 end
 
