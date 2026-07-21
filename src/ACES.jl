@@ -1,4 +1,4 @@
-module AlgorithmicCalculus
+module ACES
 
 __precompile__(false)
 

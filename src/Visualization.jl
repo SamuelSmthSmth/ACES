@@ -25,7 +25,7 @@ end
 
 Render intermediate generation steps back to perfectly readable LaTeX.
 """
-function generate_proof(steps::Vector{ASTNode})
+function generate_proof(steps::AbstractVector{<:ASTNode})
     proof_latex = String[]
     for (i, step) in enumerate(steps)
         if step isa AlgebraicNode

@@ -1,9 +1,9 @@
 using Pkg
 Pkg.activate(".")
-using AlgorithmicCalculus
-using AlgorithmicCalculus.GeneratorBase
-using AlgorithmicCalculus.Obfuscation
-using AlgorithmicCalculus.Visualization
+using ACES
+using ACES.GeneratorBase
+using ACES.Obfuscation
+using ACES.Visualization
 using Symbolics
 
 println("=== Testing Generative Matrix ===")
