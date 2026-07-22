@@ -48,14 +48,14 @@ run_test("Exploits - Glasser's Master Theorem", () -> begin
     ast = ACES.Ingestion.parse_latex(raw"\int_{-\infty}^{\infty} f(x - \frac{1}{x}) dx")
     bounded = ACES.Ingestion.propagate_domains(ast)
     ex = ACES.Exploits.detect_exploits(bounded)
-    println("Detected ", length(ex), " exploits. First: ", isempty(ex) ? "None" : ex[1].name)
+    println("Detected ", length(ex), " exploits. First: ", isempty(ex) ? "None" : ex[1].type)
 end)
 
 run_test("Exploits - King's Property", () -> begin
     ast = ACES.Ingestion.parse_latex(raw"\int_{0}^{\pi} \frac{\sin(x)}{\sin(x) + \cos(x)} dx")
     bounded = ACES.Ingestion.propagate_domains(ast)
     ex = ACES.Exploits.detect_exploits(bounded)
-    println("Detected ", length(ex), " exploits. First: ", isempty(ex) ? "None" : ex[1].name)
+    println("Detected ", length(ex), " exploits. First: ", isempty(ex) ? "None" : ex[1].type)
 end)
 
 run_test("Exploits - Random Messy LaTeX (Stress Test)", () -> begin
