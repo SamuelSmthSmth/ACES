@@ -12,7 +12,7 @@ function print_usage()
 end
 
 function parse_args()
-    args = Dict("category" => "All", "count" => "10", "output" => "dataset.jsonl")
+    args = Dict("category" => "All", "count" => "1080", "output" => "dataset.jsonl")
     i = 1
     while i <= length(ARGS)
         if ARGS[i] == "--category" && i+1 <= length(ARGS)
@@ -33,44 +33,74 @@ function parse_args()
     return args
 end
 
+const TECHNIQUES = Dict(
+    "Integration" => ["Reverse_Risch", "Parametric_Integration", "Algebraic_Substitution"],
+    "Differentiation" => ["Logarithmic_Tower", "Implicit_Chain_Rule", "Quotient_Rule_Cascade"],
+    "Summation" => ["Gosper_Telescoping", "Arithmogeometric_Series", "Partial_Fraction_Collapse"],
+    "Limit" => ["Taylor_Trap", "LHopital_Tower", "Algebraic_Conjugate"]
+)
+
+const DIFFICULTIES = [
+    (name="Easy", depth=2, obf_passes=0),
+    (name="Medium", depth=4, obf_passes=1),
+    (name="Hard", depth=6, obf_passes=2)
+]
+
 function generate_category(category, count, io)
-    println("Generating $count questions for $category...")
-    for i in 1:count
-        # Depth ranges from 2 to 5 for variety
-        depth = rand(2:5)
-        
-        problem_node, solution_node, exploit_type = if category == "Integration"
-            generate_integration_problem(depth)
-        elseif category == "Differentiation"
-            generate_differentiation_problem(depth)
-        elseif category == "Summation"
-            generate_summation_problem(depth)
-        elseif category == "Limit"
-            generate_limit_problem(depth)
-        end
-        
-        # Obfuscation Passes
-        obf_passes = rand(0:2)
-        obfuscated_payload = equality_expansion(problem_node.payload, passes=obf_passes)
-        
-        # Extract LaTeX
-        prob_tex = ast_to_latex(obfuscated_payload)
-        sol_tex = ast_to_latex(solution_node.payload)
-        
-        record = Dict(
-            "id" => string(uppercase(category[1:3]), "_", lpad(i, 4, '0')),
-            "category" => category,
-            "exploit_type" => exploit_type,
-            "difficulty" => (obf_passes == 0 ? "Easy" : (obf_passes == 1 ? "Medium" : "Hard")),
-            "problem_latex" => prob_tex,
-            "solution_latex" => sol_tex,
-            "proof_steps" => ["Generated via $exploit_type with depth $depth", "Applied $obf_passes MBA equality expansion passes."]
-        )
-        
-        # Write streaming JSONL format
-        println(io, JSON.json(record))
-        if i % 100 == 0
-            println("  ...generated $i / $count")
+    println("Generating ~$count questions for $category...")
+    
+    techs = TECHNIQUES[category]
+    num_buckets = length(techs) * length(DIFFICULTIES)
+    
+    # We round to ensure perfectly equal buckets
+    count_per_bucket = max(1, count ÷ num_buckets)
+    actual_total = count_per_bucket * num_buckets
+    
+    if actual_total != count
+        println("  Note: Adjusting count from $count to $actual_total for perfectly equal divisions.")
+    end
+    
+    global_idx = 1
+    
+    for tech in techs
+        for diff in DIFFICULTIES
+            for i in 1:count_per_bucket
+                problem_node, solution_node, exploit_type = if category == "Integration"
+                    generate_integration_problem(diff.depth, tech)
+                elseif category == "Differentiation"
+                    generate_differentiation_problem(diff.depth, tech)
+                elseif category == "Summation"
+                    generate_summation_problem(diff.depth, tech)
+                elseif category == "Limit"
+                    generate_limit_problem(diff.depth, tech)
+                end
+                
+                # Obfuscation Passes tied to difficulty
+                obfuscated_payload = equality_expansion(problem_node.payload, passes=diff.obf_passes)
+                
+                # Extract LaTeX
+                prob_tex = ast_to_latex(obfuscated_payload)
+                sol_tex = ast_to_latex(solution_node.payload)
+                
+                record = Dict(
+                    "id" => string(uppercase(category[1:3]), "_", lpad(global_idx, 4, '0')),
+                    "category" => category,
+                    "exploit_type" => exploit_type,
+                    "difficulty" => diff.name,
+                    "problem_latex" => prob_tex,
+                    "solution_latex" => sol_tex,
+                    "proof_steps" => ["Generated via $exploit_type with depth $(diff.depth)", "Applied $(diff.obf_passes) MBA equality expansion passes."]
+                )
+                
+                # Write streaming JSONL format
+                println(io, JSON.json(record))
+                
+                if global_idx % 100 == 0
+                    println("  ...generated $global_idx / $actual_total")
+                end
+                
+                global_idx += 1
+            end
         end
     end
 end
