@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate(".")
+
 println("Locating SymbolicIntegration.jl...")
 
 pkg_path = Base.find_package("SymbolicIntegration")
@@ -22,6 +25,7 @@ else
         patched_content = replace(content, "module SymbolicIntegration" => "module SymbolicIntegration\n__precompile__(false)")
     end
     
+    chmod(pkg_path, 0o666)
     write(pkg_path, patched_content)
     println("Successfully patched SymbolicIntegration to bypass the upstream precompilation crash!")
 end

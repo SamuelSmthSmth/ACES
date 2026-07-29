@@ -4,7 +4,27 @@ using ..Ingestion
 using Latexify
 using Symbolics
 
-export generate_proof, forward_verify
+export generate_proof, forward_verify, ast_to_latex
+
+"""
+    ast_to_latex(expr)
+
+Converts a Symbolics expression or ASTNode to a raw LaTeX string suitable for dataset serialization.
+"""
+function ast_to_latex(expr)
+    if expr isa AlgebraicNode
+        # Extract Symbolics payload
+        payload = expr.payload
+    else
+        payload = expr
+    end
+    # latexify gives a LaTeX formatted string, we strip the $ $ tags
+    raw_tex = string(latexify(payload, env=:raw))
+    # Basic cleanup for clean json representation
+    raw_tex = replace(raw_tex, "\\begin{equation}" => "")
+    raw_tex = replace(raw_tex, "\\end{equation}" => "")
+    return strip(raw_tex)
+end
 
 """
     forward_verify(expr)
@@ -16,7 +36,7 @@ function forward_verify(expr)
     @eval using SymbolicIntegration
     @variables x
     # Forward pass using RUBI rules, via invokelatest to avoid world-age and namespace issues
-    result = Base.invokelatest(SymbolicIntegration.integrate, expr, x)
+    result = Base.invokelatest(eval(:(SymbolicIntegration.integrate)), expr, x)
     return result
 end
 
